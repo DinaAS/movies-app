@@ -1,0 +1,68 @@
+.ant-card-contain-grid .ant-card-body {
+  flex-wrap: nowrap;
+}
+
+.card-container {
+  font-family: 'Inter', sans-serif;
+  border: none;
+  max-width: 454px;
+  height: 281px;
+}
+
+.card-container:not(:last-child) {
+  margin-right: 30px;
+}
+
+.card-container .poster-container {
+  width: 183px;
+  height: 281px;
+  padding: 0;
+}
+
+.card-container .content-container {
+  width: 271px;
+  height: 281px;
+  padding: 12px 20px 49px 20px;
+  overflow: hidden;
+}
+
+.poster {
+  padding: 0;
+  width: 100%;
+}
+
+.title {
+  display: block;
+  max-height: 30px;
+  font-family: 'Inter UI';
+  font-size: 20px;
+  line-height: 28px;
+  margin: 0;
+  margin-bottom: 7px;
+}
+
+.date-release {
+  margin-bottom: 15px;
+  color: #827e7e;
+  font-family: 'Inter UI';
+  font-size: 12px;
+  line-height: 22px;
+  text-align: center;
+}
+
+.genres-group {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.genre-btn {
+  background: #fafafa;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.overview {
+  width: 228px;
+  height: 129px;
+  overflow: hidden;
+}
