@@ -1,3 +1,21 @@
 .container {
+  height: 100vh;
   background: #e5e5e5;
+}
+
+.wrapper {
+  width: 70%;
+  height: 100vh;
+  padding: 15px 30px;
+  margin: 0 auto;
+  background: #ffffff;
+}
+
+.search-input {
+  margin-bottom: 20px;
+}
+
+.pagination {
+  max-width: 275px;
+  margin: 0 auto;
 }

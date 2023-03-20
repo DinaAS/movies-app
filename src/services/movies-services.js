@@ -12,8 +12,20 @@ export default class MoviesServices {
     return res.json()
   }
 
-  async searchMovies(text) {
-    const res = await this.getResourse(`search/movie?query=${text}&api_key=${this.apiKey}&language=en-US&page=1`)
-    return res.results
+  async searchMovies(text, page = 1) {
+    const res = await this.getResourse(`search/movie?query=${text}&api_key=${this.apiKey}&language=en-US&page=${page}`)
+    return res.results.map(MoviesServices.transformMoviesList)
+  }
+
+  static transformMoviesList(result) {
+    return {
+      id: result.id,
+      title: result.title,
+      releaseDate: result.release_date,
+      genres: result.genre_ids,
+      overview: result.overview,
+      poster: result.poster_path,
+      rate: result.vote_average,
+    }
   }
 }

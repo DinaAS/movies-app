@@ -1,9 +1,12 @@
-import { Button, Card, Space } from 'antd'
+import { Button, Card, Space, Rate } from 'antd'
 import React from 'react'
 import { format, parseISO } from 'date-fns'
 import { enGB } from 'date-fns/locale'
 
+import Spinner from '../spinner'
 import './movies-card.css'
+
+import iconNoImage from './no-image.png'
 
 class MoviesCard extends React.Component {
   genresData = [
@@ -27,30 +30,38 @@ class MoviesCard extends React.Component {
     { id: 37, name: 'Western' },
   ]
 
-  constructor(props) {
-    super(props)
-
-    this.title = props.props.original_title
-    this.releaseDate = props.props.release_date
-    this.genres = props.props.genre_ids
-    this.overview = props.props.overview
-    this.poster = props.props.poster_path
-    this.newOverview = this.sliceOverview()
+  constructor({ props }) {
+    super()
+    this.title = props.title
+    this.releaseDate = props.releaseDate
+    this.genres = props.genres
+    this.overview = props.overview
+    this.poster = props.poster
+    this.rate = props.rate
+    this.loading = props.loading
+    this.newTitle = this.sliceTitle()
   }
 
-  sliceOverview() {
-    let newOverview = this.overview
-    if (newOverview.length > 185) {
-      for (let i = newOverview.length - 1; i > 0; i -= 1) {
-        if (newOverview[i] === ' ') {
-          newOverview = `${this.overview.slice(0, 198)} ...`
-        }
+  sliceTitle() {
+    let newTitle = this.title
+    if (newTitle.length > 17) {
+      let count = newTitle.length - 1
+      while (newTitle[count] !== ' ') {
+        count -= 1
       }
+      newTitle = `${newTitle.slice(0, count)} ...`
     }
-    return newOverview
+    return newTitle
   }
 
   render() {
+    const spin = this.loading ? <Spinner /> : null
+    const iconImage = this.poster ? (
+      <img className="poster" src={`https://image.tmdb.org/t/p/original/${this.poster}`} alt="poster" />
+    ) : (
+      <img className="poster" src={iconNoImage} alt="poster" />
+    )
+
     const date = this.releaseDate ? format(parseISO(this.releaseDate), 'MMMM dd, yyyy', { locale: enGB }) : null
     const genresArr = this.genresData.filter((genre) => this.genres.includes(genre.id))
     const genresNames = genresArr.slice(0, 3).map((genre) => {
@@ -63,17 +74,36 @@ class MoviesCard extends React.Component {
       )
     })
 
+    let classNameOfRateIcon = 'rate-icon'
+
+    if (this.rate >= 7) {
+      classNameOfRateIcon += ' green'
+    }
+
+    if (this.rate < 7 && this.rate >= 5) {
+      classNameOfRateIcon += ' yellow'
+    }
+
+    if (this.rate < 5) {
+      classNameOfRateIcon += ' red'
+    }
+
     return (
       <Card className="card-container">
         <Card.Grid className="poster-container" hoverable={false}>
-          <img className="poster" src={`https://image.tmdb.org/t/p/original/${this.poster}`} alt="" />
+          {spin}
+          {iconImage}
         </Card.Grid>
 
         <Card.Grid className="content-container" hoverable={false}>
-          <h5 className="title">{this.title}</h5>
+          <div className="card-header">
+            <h5 className="title">{this.newTitle}</h5>
+            <div className={classNameOfRateIcon}>{this.rate.toFixed(1)}</div>
+          </div>
           <span className="date-release">{date}</span>
           <Space className="genres-group">{genresNames}</Space>
-          <div className="overview">{this.newOverview}</div>
+          <div className="overview">{this.overview}</div>
+          <Rate className="rate-star" disabled value={this.rate} count={10} allowHalf />
         </Card.Grid>
       </Card>
     )
@@ -81,19 +111,3 @@ class MoviesCard extends React.Component {
 }
 
 export default MoviesCard
-
-// list.map((movie) => {
-//     const { genre_ids } = movie
-// const genresArray = this.genresData.map((genre) => {
-//   if (genre_ids.includes(genre.id)) {
-//     return genre.name
-//   }
-// })
-
-//     return this.setState({
-//       title: movie.original_title,
-//       releaseDate: movie.release_date,
-//       genres: genresArray,
-//       overview: movie.overview,
-//     })
-//   })
