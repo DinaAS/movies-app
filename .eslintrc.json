@@ -25,6 +25,7 @@
     ],
     "rules": {
         "indent": ["error", 2],
+        "arrow-body-style": "off",
         "prettier/prettier": "error",
         "linebreak-style": [0, "unix"],
         "quotes": ["error", "single"],

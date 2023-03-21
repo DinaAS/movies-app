@@ -1,4 +1,5 @@
-import { Layout, Input, Pagination } from 'antd'
+import { Input } from 'antd'
+import { debounce } from 'lodash'
 import React from 'react'
 import { Offline, Online } from 'react-detect-offline'
 
@@ -10,6 +11,7 @@ import SliderMenu from '../slider-menu'
 import ErrorIndicator from '../error-indicator'
 import Spinner from '../spinner'
 import OfflineIndicator from '../offline-indicator'
+import EmptyContainer from '../empty-container'
 
 class App extends React.Component {
   moviesService = new MoviesServices()
@@ -18,12 +20,21 @@ class App extends React.Component {
     super()
     this.state = {
       movies: [],
-      loading: true,
+      loading: false,
       error: false,
+      searchValue: '',
+      emptyResult: true,
     }
 
-    this.searchMovies()
+    this.updateFunc = debounce(this.searchMovies, 5000)
     this.onChange = this.onChange.bind(this)
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { searchValue } = this.state
+    if (prevState.searchValue !== searchValue) {
+      this.updateFunc(searchValue)
+    }
   }
 
   onError = () => {
@@ -34,17 +45,9 @@ class App extends React.Component {
   }
 
   onChange(number) {
-    this.moviesService.searchMovies('return', number).then((movies) => {
-      this.setState({
-        movies,
-        loading: false,
-      })
-    })
-  }
-
-  searchMovies() {
+    const { searchValue } = this.state
     this.moviesService
-      .searchMovies('return')
+      .searchMovies(searchValue, number)
       .then((movies) => {
         this.setState({
           movies,
@@ -54,27 +57,72 @@ class App extends React.Component {
       .catch(this.onError)
   }
 
+  onChangeInput = (e) => {
+    if (e.length <= 0) {
+      this.setState(() => {
+        return {
+          loading: false,
+        }
+      })
+    } else {
+      this.setState(() => {
+        return {
+          movies: [],
+          searchValue: e,
+          loading: true,
+        }
+      })
+    }
+  }
+
+  searchMovies(text) {
+    this.moviesService
+      .searchMovies(text)
+      .then((movies) => {
+        if (movies.length <= 0) {
+          this.setState({
+            emptyResult: true,
+            loading: false,
+          })
+        } else {
+          this.setState({
+            movies,
+            loading: false,
+            emptyResult: false,
+          })
+        }
+      })
+      .catch(this.onError)
+  }
+
   render() {
-    const { movies, loading, error } = this.state
+    const { movies, loading, error, emptyResult } = this.state
 
     const spin = loading ? <Spinner /> : null
     const errorMassage = error ? <ErrorIndicator /> : null
+    const mainContent = !emptyResult ? (
+      <MoviesList movies={movies} loading={loading} onChange={this.onChange} />
+    ) : (
+      <EmptyContainer />
+    )
 
     return (
       <>
         <Online>
-          <Layout className="container">
+          <div className="main-container">
             <div className="wrapper">
               <SliderMenu />
 
-              <Input className="search-input" placeholder="Type to search..." />
+              <Input
+                className="search-input"
+                placeholder="Type to search..."
+                onChange={(e) => this.onChangeInput(e.target.value)}
+              />
               {spin}
               {errorMassage}
-              <MoviesList movies={movies} loading={loading} />
-
-              {!error && <Pagination className="pagination" defaultCurrent={1} total={50} onChange={this.onChange} />}
+              {mainContent}
             </div>
-          </Layout>
+          </div>
         </Online>
         <Offline>
           <OfflineIndicator />

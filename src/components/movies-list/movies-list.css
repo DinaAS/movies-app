@@ -4,3 +4,8 @@
   margin-bottom: 44px;
   background: #ffffff;
 }
+
+.pagination {
+  max-width: 275px;
+  margin: 0 auto;
+}
