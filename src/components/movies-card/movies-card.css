@@ -5,7 +5,7 @@
 .card-container {
   font-family: 'Inter', sans-serif;
   max-width: 454px;
-  height: 281px;
+  height: 274px;
   border: none;
   border-radius: 0;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
@@ -15,19 +15,41 @@
   margin-right: 30px;
 }
 
+@media (max-width: 500px) {
+  .card-container {
+    max-width: 387px;
+    padding: 10px;
+  }
+}
+
 .card-container .poster-container {
   width: 183px;
-  height: 281px;
   padding: 0;
+  box-shadow: none;
+}
+
+@media (max-width: 500px) {
+  .card-container .poster-container {
+    width: 20%;
+    max-height: 90px;
+  }
 }
 
 .card-container .content-container {
   display: flex;
   flex-direction: column;
   width: 271px;
-  height: 281px;
+  height: 273px;
   box-shadow: none;
   overflow: hidden;
+}
+
+@media (max-width: 500px) {
+  .card-container .content-container {
+    width: 100%;
+    height: 100%;
+    padding-left: 13px;
+  }
 }
 
 .poster {
@@ -67,16 +89,20 @@
   line-height: 22px;
 }
 
+.orange {
+  border: solid 1px #e97e00;
+}
+
+.red {
+  border: solid 1px #e90000;
+}
+
 .yellow {
   border: solid 1px #e9d100;
 }
 
-.red {
-  border: solid 1px red;
-}
-
 .green {
-  border: solid 1px green;
+  border: solid 1px #66e900;
 }
 
 .date-release {
@@ -86,29 +112,43 @@
   line-height: 30px;
 }
 
-.genres-group {
-  display: flex;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
-}
-
-.genre-btn {
-  background: #fafafa;
-  color: rgba(0, 0, 0, 0.65);
-}
-
 .overview {
-  display: -webkit-box;
-  width: 228px;
-  font-size: 0.8em;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  text-overflow: '';
-  overflow: hidden;
+  font-family: 'Inter UI';
+  font-size: 12px;
+  line-height: 22px;
+}
+
+@media (max-width: 500px) {
+  .overview {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    top: 100px;
+  }
 }
 
 .rate-star {
   line-height: 1em;
   margin-top: auto;
   font-size: 15px;
+}
+
+@media (max-width: 500px) {
+  .rate-star {
+    text-align: end;
+  }
+}
+
+.alert {
+  margin-top: auto;
+  margin-left: auto;
+  padding: 5px 8px;
+}
+
+@media (max-width: 500px) {
+  .alert {
+    position: absolute;
+    bottom: 50px;
+    right: 10px;
+  }
 }

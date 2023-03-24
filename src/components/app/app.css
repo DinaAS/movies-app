@@ -11,8 +11,10 @@
   background: #ffffff;
 }
 
-.full-wrapper {
-  height: 100vh;
+@media (max-width: 500px) {
+  .wrapper {
+    width: 100%;
+  }
 }
 
 .search-input {

@@ -1,0 +1,18 @@
+.genres-group {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 7px;
+}
+
+.genre-btn {
+  height: fit-content;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  background: #fafafa;
+  color: rgba(0, 0, 0, 0.65);
+}

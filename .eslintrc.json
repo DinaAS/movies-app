@@ -24,7 +24,7 @@
         "react", "prettier", "import"
     ],
     "rules": {
-        "indent": ["error", 2],
+        "indent": "off",
         "arrow-body-style": "off",
         "prettier/prettier": "error",
         "linebreak-style": [0, "unix"],

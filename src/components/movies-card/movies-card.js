@@ -1,60 +1,72 @@
-import { Button, Card, Space, Rate } from 'antd'
+import { Card, Rate, Alert } from 'antd'
 import React from 'react'
 import { format, parseISO } from 'date-fns'
 import { enGB } from 'date-fns/locale'
+import { truncate } from 'lodash'
 
+import MoviesServices from '../../services/movies-services'
 import Spinner from '../spinner'
-import './movies-card.css'
+import { GenresConsumer } from '../genres-context/genres-context'
+import GenresGroup from '../genres-group'
 
+import './movies-card.css'
 import iconNoImage from './no-image.png'
 
 class MoviesCard extends React.Component {
-  genresData = [
-    { id: 28, name: 'Action' },
-    { id: 12, name: 'Adventure' },
-    { id: 16, name: 'Animation' },
-    { id: 35, name: 'Comedy' },
-    { id: 80, name: 'Crime' },
-    { id: 99, name: 'Documentary' },
-    { id: 18, name: 'Drama' },
-    { id: 10751, name: 'Family' },
-    { id: 14, name: 'Fantasy' },
-    { id: 36, name: 'History' },
-    { id: 27, name: 'Horror' },
-    { id: 10402, name: 'Music' },
-    { id: 9648, name: 'Mystery' },
-    { id: 10749, name: 'Romance' },
-    { id: 10770, name: 'TV Movie' },
-    { id: 53, name: 'Thriller' },
-    { id: 10752, name: 'War' },
-    { id: 37, name: 'Western' },
-  ]
+  moviesService = new MoviesServices()
 
-  constructor({ props }) {
+  constructor({ props, id, idSession }) {
     super()
+    this.id = id
+    this.idSession = idSession
     this.title = props.title
     this.releaseDate = props.releaseDate
-    this.genres = props.genres
+    this.genresIds = props.genresIds
     this.overview = props.overview
     this.poster = props.poster
     this.rate = props.rate
     this.loading = props.loading
+    this.rating = props.rating
     this.newTitle = this.sliceTitle()
+    this.newOverview = this.sliceOverview()
+
+    this.state = {
+      sendRate: false,
+    }
+  }
+
+  onChangeRate(e) {
+    this.moviesService.sendRate(this.idSession, this.id, e).then((res) => {
+      if (res.ok) {
+        this.setState({
+          sendRate: true,
+        })
+      }
+    })
   }
 
   sliceTitle() {
-    let newTitle = this.title
-    if (newTitle.length > 17) {
-      let count = newTitle.length - 1
-      while (newTitle[count] !== ' ') {
-        count -= 1
-      }
-      newTitle = `${newTitle.slice(0, count)} ...`
-    }
+    const newTitle = truncate(this.title, {
+      length: 20,
+      separator: ' ',
+      omission: '...',
+    })
+
     return newTitle
   }
 
+  sliceOverview() {
+    const newOverview = truncate(this.overview, {
+      length: 120,
+      separator: ' ',
+      omission: '...',
+    })
+    return newOverview
+  }
+
   render() {
+    const { sendRate } = this.state
+    const alert = sendRate ? <Alert className="alert" message="Rate send" type="success" /> : null
     const spin = this.loading ? <Spinner /> : null
     const iconImage = this.poster ? (
       <img className="poster" src={`https://image.tmdb.org/t/p/original/${this.poster}`} alt="poster" />
@@ -63,49 +75,58 @@ class MoviesCard extends React.Component {
     )
 
     const date = this.releaseDate ? format(parseISO(this.releaseDate), 'MMMM dd, yyyy', { locale: enGB }) : null
-    const genresArr = this.genresData.filter((genre) => this.genres.includes(genre.id))
-    const genresNames = genresArr.slice(0, 3).map((genre) => {
-      const { id, name } = genre
 
-      return (
-        <Button key={id} className="genre-btn">
-          {name}
-        </Button>
-      )
-    })
+    const rating = this.rating ? this.rating : 0
 
     let classNameOfRateIcon = 'rate-icon'
 
-    if (this.rate >= 7) {
+    if (this.rate > 7) {
       classNameOfRateIcon += ' green'
     }
 
-    if (this.rate < 7 && this.rate >= 5) {
+    if (this.rate >= 5 && this.rate <= 7) {
+      classNameOfRateIcon += ' orange'
+    }
+
+    if (this.rate < 5 && this.rate >= 3) {
       classNameOfRateIcon += ' yellow'
     }
 
-    if (this.rate < 5) {
+    if (this.rate < 3) {
       classNameOfRateIcon += ' red'
     }
 
     return (
-      <Card className="card-container">
-        <Card.Grid className="poster-container" hoverable={false}>
-          {spin}
-          {iconImage}
-        </Card.Grid>
+      <GenresConsumer>
+        {(genres) => {
+          return (
+            <Card className="card-container">
+              <Card.Grid className="poster-container" hoverable={false}>
+                {spin}
+                {iconImage}
+              </Card.Grid>
 
-        <Card.Grid className="content-container" hoverable={false}>
-          <div className="card-header">
-            <h5 className="title">{this.newTitle}</h5>
-            <div className={classNameOfRateIcon}>{this.rate.toFixed(1)}</div>
-          </div>
-          <span className="date-release">{date}</span>
-          <Space className="genres-group">{genresNames}</Space>
-          <div className="overview">{this.overview}</div>
-          <Rate className="rate-star" disabled value={this.rate} count={10} allowHalf />
-        </Card.Grid>
-      </Card>
+              <Card.Grid className="content-container" hoverable={false}>
+                <div className="card-header">
+                  <h5 className="title">{this.newTitle}</h5>
+                  <div className={classNameOfRateIcon}>{this.rate.toFixed(1)}</div>
+                </div>
+                <span className="date-release">{date}</span>
+                <GenresGroup genres={genres} genresIds={this.genresIds} />
+                <div className="overview">{this.newOverview}</div>
+                {alert}
+                <Rate
+                  className="rate-star"
+                  defaultValue={rating}
+                  count={10}
+                  allowHalf
+                  onChange={(e) => this.onChangeRate(e)}
+                />
+              </Card.Grid>
+            </Card>
+          )
+        }}
+      </GenresConsumer>
     )
   }
 }

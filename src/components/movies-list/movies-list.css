@@ -5,7 +5,12 @@
   background: #ffffff;
 }
 
+@media (max-width: 500px) {
+  .movies-list {
+    size: small;
+  }
+}
+
 .pagination {
-  max-width: 275px;
-  margin: 0 auto;
+  text-align: center;
 }
